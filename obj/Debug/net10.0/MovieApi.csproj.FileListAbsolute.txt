@@ -146,3 +146,4 @@ C:\Users\LENOVO\Documents\github\MovieApi\obj\Debug\net10.0\refint\MovieApi.dll
 C:\Users\LENOVO\Documents\github\MovieApi\obj\Debug\net10.0\MovieApi.pdb
 C:\Users\LENOVO\Documents\github\MovieApi\obj\Debug\net10.0\MovieApi.genruntimeconfig.cache
 C:\Users\LENOVO\Documents\github\MovieApi\obj\Debug\net10.0\ref\MovieApi.dll
+C:\Users\LENOVO\Documents\github\MovieApi\obj\Debug\net10.0\MovieApi.sourcelink.json

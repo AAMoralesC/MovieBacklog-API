@@ -6,7 +6,32 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<MovieDb>(opt =>opt.UseSqlite("Data Source=movies.db"));
 builder.Services.AddOpenApi();
 
+//Definir la política de permisos
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        policy =>
+        {
+            policy.AllowAnyOrigin()    // Permite cualquier origen (incluyendo 'null')
+                  .AllowAnyMethod()    // Permite GET, POST, PUT, DELETE
+                  .AllowAnyHeader();   // Permite cualquier encabezado
+        });
+});
+
+builder.Services.AddDbContext<MovieDb>(opt => opt.UseSqlite("Data Source=movies.db"));
+builder.Services.AddOpenApi();
+
 var app = builder.Build();
+
+//Usar la política de permisos
+app.UseCors("AllowAll"); 
+
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+}
+
+app.UseHttpsRedirection();
 
 // Configuracion del servidor
  if (app.Environment.IsDevelopment())
