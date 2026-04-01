@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Movie Backlog Pro</title>
+    <title>Movie Backlog</title>
     <style>
         :root { --primary: #6200ee; --danger: #cf6679; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 40px auto; background: #f8f9fa; color: #333; }
@@ -19,11 +19,13 @@
         .btn-delete { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 1.2rem; }
         input[type="checkbox"] { transform: scale(1.3); cursor: pointer; }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 
 <div class="container">
     <h1>🎬 Mi Movie Backlog</h1>
+    <p id="counter" style="color: #666; font-weight: bold; margin-bottom: 20px;"></p>
     
     <div class="input-group">
         <input type="text" id="movieTitle" placeholder="Nombre de la película...">
@@ -49,20 +51,48 @@
     }
 
     function renderMovies(movies) {
-        const list = document.getElementById('movieList');
-        list.innerHTML = movies.length === 0 ? '<p style="text-align:center; color:#999;">No hay películas en tu lista.</p>' : '';
-        
-        movies.forEach(m => {
-            list.innerHTML += `
-                <div class="movie-item">
-                    <div class="movie-info">
-                        <input type="checkbox" ${m.watched ? 'checked' : ''} onchange="toggleWatched(${m.id}, '${m.title}', ${m.watched})">
-                        <span class="movie-title ${m.watched ? 'completed' : ''}">${m.title}</span>
-                    </div>
-                    <button class="btn-delete" onclick="deleteMovie(${m.id})">🗑️</button>
-                </div>`;
-        });
+    const list = document.getElementById('movieList');
+    const counter = document.getElementById('counter');
+
+    // --- Lógica del contador ---
+    // Sacamos el total de pelis que vienen de la base de datos
+    const total = movies.length;
+    // Filtramos las que ya están marcadas como true en 'watched'
+    const watchedCount = movies.filter(m => m.watched).length;
+    const pendingCount = total - watchedCount;
+
+    // Actualizamos el texto del contador arriba de la lista
+    if (total === 0) {
+        counter.innerHTML = "No hay pelis aún. ¡Agrega una!";
+    } else {
+        counter.innerHTML = `Total: ${total} | Vistas: ${watchedCount} | Pendientes: ${pendingCount}`;
     }
+
+    // --- Dibujar la lista ---
+    // Limpiamos el div antes de volver a llenarlo para que no se dupliquen
+    list.innerHTML = '';
+
+    if (total === 0) {
+        list.innerHTML = '<p style="text-align:center; color:#999;">Vacío...</p>';
+        return; 
+    }
+
+    // Recorremos el array de pelis que nos mandó el servidor
+    movies.forEach(m => {
+        // Creamos el HTML de cada fila con sus botones y el checkbox
+        list.innerHTML += `
+            <div class="movie-item">
+                <div class="movie-info">
+                    <input type="checkbox" ${m.watched ? 'checked' : ''} 
+                           onchange="toggleWatched(${m.id}, '${m.title}', ${m.watched})">
+                    
+                    <span class="movie-title ${m.watched ? 'completed' : ''}">${m.title}</span>
+                </div>
+                
+                <button class="btn-delete" onclick="deleteMovie(${m.id})">🗑️</button>
+            </div>`;
+    });
+}
 
     // CREATE: Añadir nueva
     async function addMovie() {
@@ -76,6 +106,17 @@
         });
         input.value = '';
         loadMovies();
+        Swal.fire({
+            icon: 'success',
+            title: '¡Añadida!',
+            text: 'Película guardada en el backlog',
+            showConfirmButton: false,
+            timer: 1500,
+            width: '300px', // Tamaño fijo pequeño para que no ocupe toda la pantalla
+            padding: '2em',
+            color: '#716add',
+            backdrop: `rgba(0,0,123,0.1)` // Un fondo suave para centrar la atención
+        });
     }
 
     // UPDATE: Cambiar estado Vista/Pendiente
@@ -88,13 +129,40 @@
         loadMovies();
     }
 
-    // DELETE: Eliminar de la BD
+    // DELETE: Eliminar de la BD con estilo
     async function deleteMovie(id) {
-        if (!confirm("¿Seguro que quieres eliminar esta película?")) return;
-        
-        await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-        loadMovies();
-    }
+    // Usamos SweetAlert en lugar del confirm feo del navegador
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: "¡No podrás revertir esto!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#6200ee',
+        cancelButtonColor: '#cf6679',
+        confirmButtonText: 'Sí, borrar',
+        cancelButtonText: 'Cancelar'
+    }).then(async (result) => {
+        // Si el usuario hizo clic en el botón de confirmar
+        if (result.isConfirmed) {
+            try {
+                await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+                
+                // Mostramos un mensaje de éxito rápido
+                Swal.fire({
+                    title: '¡Borrada!',
+                    text: 'La película ha sido eliminada.',
+                    icon: 'success',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+
+                loadMovies(); // Recargamos la lista
+            } catch (err) {
+                Swal.fire('Error', 'No se pudo borrar la peli', 'error');
+            }
+        }
+    });
+}
 
     // Ejecutar al cargar la página
     loadMovies();
