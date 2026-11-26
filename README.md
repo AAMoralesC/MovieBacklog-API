@@ -1,23 +1,28 @@
-🎬 Mis Películas (Backlog)
-Este es un proyecto sencillo para llevar el control de las películas que quieres ver. Tiene una lista interactiva, un contador y se guarda todo en una base de datos.
+# 🎬 MovieBacklog API
 
-✨ ¿Qué hace?
-* Añadir: Escribes el nombre de una peli y se guarda.
+API REST para gestionar un backlog de películas pendientes. Mi primer paso en el ecosistema .NET.
 
-* Marcar como vista: Al tocar el check, la peli se tacha y cambia el contador.
+## ✨ Funcionalidades
 
-* Borrar: Un botón de basura con una alerta bonita para eliminar pelis.
+- Añadir películas al backlog.
+- Marcar películas como vistas (actualiza el contador).
+- Eliminar películas con confirmación.
+- Contador de vistas vs. pendientes.
 
-* Contador: Te dice cuántas llevas vistas y cuántas te faltan.
+## 🛠️ Stack
 
-🛠️ ¿Cómo se hizo?
-* Servidor (Backend): Usé .NET 10 y una base de datos SQLite (un archivo que guarda todo).
+- **Backend:** .NET 10, SQLite
+- **Frontend:** HTML, CSS, JavaScript (carpetas separadas)
+- **Alertas:** SweetAlert2
 
-* Pantalla (Frontend): Usé HTML, CSS y JavaScript (organizados en carpetas separadas).
+## 🚀 Cómo ejecutar
 
-* Alertas: Usé una herramienta llamada SweetAlert2 para que los mensajes se vean modernos.
+1. Levantar el servidor:
+   ```bash
+   dotnet run
+   ```
+2. Abrir el frontend: entra a la carpeta `frontend` y abre `index.html` en tu navegador.
 
-🚀 Cómo probarlo
-* Encender el servidor: Abre la terminal en esta carpeta y escribe dotnet run.
+## 📄 Licencia
 
-* Abrir la página: Entra a la carpeta frontend y abre el archivo index.html en tu navegador.
+MIT. Ver [LICENSE](./LICENSE).
